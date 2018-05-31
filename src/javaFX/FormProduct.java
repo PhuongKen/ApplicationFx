@@ -6,10 +6,15 @@
 package javaFX;
 
 import entity.Product;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,9 +30,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javax.swing.JFileChooser;
 import model.ProductModel;
 
 /**
@@ -39,6 +44,8 @@ public class FormProduct extends Application {
     private Scene scene1;
     private Scene scene2;
     private Stage window;
+
+    private Desktop desktop = Desktop.getDesktop();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -57,7 +64,18 @@ public class FormProduct extends Application {
         Label lblPrice = new Label("Price");
 
         TextField txtName = new TextField();
-        TextField txtImage = new TextField();
+        final FileChooser fileChooser = new FileChooser();
+        final TextField txtImage = new TextField();
+        final Button chooser = new Button("...");
+        chooser.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                txtImage.clear();
+                List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
+                printLog(txtImage, files);
+            }
+        });
+
         TextField txtPrice = new TextField();
         //table view
         TableColumn<Product, String> columnName = new TableColumn<>("Name");
@@ -89,8 +107,11 @@ public class FormProduct extends Application {
                             ImageView imageView = new ImageView();
                             imageView.setFitHeight(50);
                             imageView.setFitWidth(50);
-                            Product p = new Product();
-                            imageView.setImage(new Image("resource/" + model.queryImage(item)));
+                            String imgString = model.queryImage(item);
+                            String[] splitArray = imgString.split("src");
+                            String i = splitArray[1].trim();
+                            System.out.println(i);
+                            imageView.setImage(new Image(i));
                             box.getChildren().addAll(imageView, vbox);
                             setGraphic(box);
                         }
@@ -129,6 +150,7 @@ public class FormProduct extends Application {
 
         GridPane.setConstraints(txtName, 3, 2);
         GridPane.setConstraints(txtImage, 3, 3);
+        GridPane.setConstraints(chooser, 4, 3);
         GridPane.setConstraints(txtPrice, 3, 4);
 
         HBox hBox = new HBox();
@@ -136,7 +158,7 @@ public class FormProduct extends Application {
         hBox.getChildren().addAll(submit, reset);
         GridPane.setConstraints(hBox, 3, 5);
 
-        pane1.getChildren().addAll(lblName, lblImage, lblPrice, txtName, txtImage, txtPrice, hBox);
+        pane1.getChildren().addAll(lblName, lblImage, lblPrice, txtName, txtImage, chooser, txtPrice, hBox);
         pane1.setAlignment(Pos.CENTER);
 
         Product p = new Product();
@@ -149,5 +171,25 @@ public class FormProduct extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private void openFile(File file) {
+        try {
+            desktop.open(file);
+        } catch (IOException ex) {
+//            Logger.getLogger(
+//                FileChooserSample.class.getName()).log(
+//                    Level.SEVERE, null, ex
+//                );
+        }
+    }
+
+    private void printLog(TextField txtImage, List<File> files) {
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+        for (File file : files) {
+            txtImage.appendText(file.getAbsolutePath() + "\n");
+        }
     }
 }
