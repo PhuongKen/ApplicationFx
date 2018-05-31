@@ -27,6 +27,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javax.swing.JFileChooser;
 import model.ProductModel;
 
 /**
@@ -39,12 +40,12 @@ public class FormProduct extends Application {
     private Scene scene2;
     private Stage window;
 
-    ProductModel model = new ProductModel();
-    TableView<Product> tableView = new TableView<>();
-    ObservableList<Product> list = FXCollections.observableArrayList();
-
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        ProductModel model = new ProductModel();
+        TableView<Product> tableView = new TableView<>();
+
         window = primaryStage;
         GridPane pane1 = new GridPane();
         pane1.setPadding(new Insets(20, 20, 20, 20));
@@ -70,9 +71,9 @@ public class FormProduct extends Application {
         TableColumn<Product, String> columnPrice = new TableColumn<>("Price");
         columnPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         columnPrice.setMinWidth(100);
-        
+
         TableColumn<Product, String> columnAction = new TableColumn<>("Action");
-        columnAction.setCellValueFactory(new PropertyValueFactory<>("price"));
+        columnAction.setCellValueFactory(new PropertyValueFactory<>(""));
         columnAction.setMinWidth(100);
 
         columnImage.setCellFactory(new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
@@ -88,7 +89,8 @@ public class FormProduct extends Application {
                             ImageView imageView = new ImageView();
                             imageView.setFitHeight(50);
                             imageView.setFitWidth(50);
-                            imageView.setImage(new Image("resource/Code.jpg"));
+                            Product p = new Product();
+                            imageView.setImage(new Image("resource/" + model.queryImage(item)));
                             box.getChildren().addAll(imageView, vbox);
                             setGraphic(box);
                         }
@@ -98,7 +100,7 @@ public class FormProduct extends Application {
 
         });
 
-        tableView.getColumns().addAll(columnImage, columnName, columnPrice,columnAction);
+        tableView.getColumns().addAll(columnImage, columnName, columnPrice, columnAction);
 
         //
         Button submit = new Button("Submit");
@@ -109,8 +111,7 @@ public class FormProduct extends Application {
             Product p = new Product(name, image, Integer.parseInt(price));
             model.save(p);
             System.out.println("Lưu thành công.");
-            model.query(new Product(name, image, 0));
-            list.addAll(p);
+            ObservableList<Product> list = model.query();
             tableView.getItems().setAll(list);
             window.setScene(scene2);
         });
@@ -141,7 +142,6 @@ public class FormProduct extends Application {
         Product p = new Product();
 
         scene2 = new Scene(tableView, 400, 300);
-
         scene1 = new Scene(pane1, 450, 280);
         primaryStage.setScene(scene1);
         primaryStage.show();

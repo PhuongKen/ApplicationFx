@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
 
 /**
  *
@@ -34,7 +35,7 @@ public class ProductModel {
         return false;
     }
 
-    public void query(Product p) {
+    public ObservableList<Product> query() {
         try {
             String sql = "select * from products";
             PreparedStatement ps = ConnectionHandle.getIntance().getConnection().prepareStatement(sql);
@@ -43,16 +44,32 @@ public class ProductModel {
                 String name = rs.getString("name");
                 String image = rs.getString("image");
                 int price = rs.getInt("price");
-                list.add(new Product(name, image, price));
+                list.addAll(new Product(name, image, price));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return list;
+    }
+
+    public String queryImage(String img) {
+        try {
+            String sql = "select * from products where image = ?";
+            PreparedStatement ps = ConnectionHandle.getIntance().getConnection().prepareStatement(sql);
+            ps.setString(1, img);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                return img;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) {
         ProductModel model = new ProductModel();
         Product p = new Product();
-        model.query(p);
+        model.query();
     }
 }
