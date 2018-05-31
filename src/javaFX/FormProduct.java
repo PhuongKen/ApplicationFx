@@ -70,6 +70,10 @@ public class FormProduct extends Application {
         TableColumn<Product, String> columnPrice = new TableColumn<>("Price");
         columnPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         columnPrice.setMinWidth(100);
+        
+        TableColumn<Product, String> columnAction = new TableColumn<>("Action");
+        columnAction.setCellValueFactory(new PropertyValueFactory<>("price"));
+        columnAction.setMinWidth(100);
 
         columnImage.setCellFactory(new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
             @Override
@@ -94,7 +98,7 @@ public class FormProduct extends Application {
 
         });
 
-        tableView.getColumns().addAll(columnImage, columnName, columnPrice);
+        tableView.getColumns().addAll(columnImage, columnName, columnPrice,columnAction);
 
         //
         Button submit = new Button("Submit");
@@ -138,7 +142,7 @@ public class FormProduct extends Application {
 
         scene2 = new Scene(tableView, 400, 300);
 
-        scene1 = new Scene(pane1, 400, 300);
+        scene1 = new Scene(pane1, 450, 280);
         primaryStage.setScene(scene1);
         primaryStage.show();
     }
